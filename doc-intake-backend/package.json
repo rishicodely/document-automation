@@ -17,6 +17,7 @@
     "class-validator": "^0.14.0",
     "multer": "^1.4.5-lts.1",
     "openai": "^6.49.0",
+    "pdf-parse": "^1.1.1",
     "pdfjs-dist": "^4.0.379",
     "pg": "^8.11.0",
     "reflect-metadata": "^0.2.0",
