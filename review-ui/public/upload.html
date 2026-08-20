@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Upload Invoice</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"></script>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-slate-50 min-h-screen flex items-center justify-center p-6">
+    <div
+      class="w-full max-w-md bg-white rounded-xl border border-slate-200 shadow-sm p-6"
+    >
+      <h1 class="text-lg font-semibold text-slate-900 mb-1">Upload Invoice</h1>
+      <p class="text-sm text-slate-500 mb-5">
+        Drop a PDF to run it through extraction and validation.
+      </p>
+
+      <label
+        id="drop"
+        class="block border-2 border-dashed border-slate-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition"
+      >
+        <input id="file" type="file" accept="application/pdf" class="hidden" />
+        <span id="label" class="text-sm text-slate-500"
+          >Click to choose a PDF, or drop one here</span
+        >
+      </label>
+
+      <button
+        id="send"
+        class="mt-4 w-full rounded-lg bg-blue-600 text-white text-sm font-medium py-2.5 hover:bg-blue-700 disabled:opacity-50 transition"
+        disabled
+      >
+        Upload &amp; Process
+      </button>
+
+      <div id="result" class="mt-5 hidden">
+        <div class="rounded-lg border p-4 text-sm" id="result-box"></div>
+        <a
+          href="/"
+          class="block mt-3 text-center text-sm text-blue-600 hover:text-blue-700 underline underline-offset-2"
+        >
+          Go to review queue →
+        </a>
+      </div>
+    </div>
+
+    <script>
+      const API = "http://localhost:3000";
+      const fileInput = document.getElementById("file");
+      const drop = document.getElementById("drop");
+      const label = document.getElementById("label");
+      const sendBtn = document.getElementById("send");
+      const result = document.getElementById("result");
+      const resultBox = document.getElementById("result-box");
+      let chosen = null;
+
+      function pick(f) {
+        if (!f) return;
+        chosen = f;
+        label.textContent = f.name;
+        sendBtn.disabled = false;
+      }
+
+      fileInput.addEventListener("change", (e) => pick(e.target.files[0]));
+
+      // Drag and drop
+      ["dragover", "dragenter"].forEach((ev) =>
+        drop.addEventListener(ev, (e) => {
+          e.preventDefault();
+          drop.classList.add("border-blue-400", "bg-blue-50");
+        }),
+      );
+      ["dragleave", "drop"].forEach((ev) =>
+        drop.addEventListener(ev, (e) => {
+          e.preventDefault();
+          drop.classList.remove("border-blue-400", "bg-blue-50");
+        }),
+      );
+      drop.addEventListener("drop", (e) => pick(e.dataTransfer.files[0]));
+
+      sendBtn.addEventListener("click", async () => {
+        if (!chosen) return;
+        sendBtn.disabled = true;
+        sendBtn.textContent = "Processing…";
+
+        const form = new FormData();
+        form.append("file", chosen);
+
+        try {
+          const res = await fetch(`${API}/jobs/upload`, {
+            method: "POST",
+            body: form,
+          });
+          const job = await res.json();
+
+          const status = job.status;
+          const color =
+            status === "done"
+              ? "green"
+              : status === "needs_review"
+                ? "amber"
+                : "red";
+          const colorMap = {
+            green: "border-green-300 bg-green-50 text-green-800",
+            amber: "border-amber-300 bg-amber-50 text-amber-800",
+            red: "border-red-300 bg-red-50 text-red-800",
+          };
+          resultBox.className =
+            "rounded-lg border p-4 text-sm " + colorMap[color];
+          resultBox.innerHTML =
+            '<div class="font-medium">Status: ' +
+            status +
+            "</div>" +
+            (job.errorReason
+              ? '<div class="mt-1">' + job.errorReason + "</div>"
+              : "") +
+            (job.validation?.flags?.length
+              ? '<div class="mt-1">' +
+                job.validation.flags.length +
+                " validation flag(s)</div>"
+              : "");
+          result.classList.remove("hidden");
+        } catch (err) {
+          resultBox.className =
+            "rounded-lg border p-4 text-sm border-red-300 bg-red-50 text-red-800";
+          resultBox.textContent = "Upload failed: " + err.message;
+          result.classList.remove("hidden");
+        } finally {
+          sendBtn.textContent = "Upload & Process";
+          sendBtn.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>
