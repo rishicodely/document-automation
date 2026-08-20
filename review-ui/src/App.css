@@ -1,0 +1,144 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  color: #1a1a1a;
+}
+
+.app {
+  display: flex;
+  height: 100vh;
+}
+
+.queue {
+  width: 280px;
+  border-right: 1px solid #e2e2e2;
+  padding: 16px;
+  overflow-y: auto;
+  background: #fafafa;
+}
+.queue h2 {
+  font-size: 15px;
+  margin: 0 0 12px;
+}
+.empty {
+  color: #888;
+  font-size: 14px;
+}
+
+.queue-item {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  border: 1px solid #e2e2e2;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 13px;
+}
+.queue-item.active {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+.qi-vendor {
+  font-weight: 600;
+}
+.qi-flags {
+  color: #b45309;
+  font-size: 12px;
+}
+
+.detail {
+  flex: 1;
+  overflow: hidden;
+}
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #999;
+}
+
+.review-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 100%;
+}
+
+.doc-pane {
+  border-right: 1px solid #e2e2e2;
+  background: #f4f4f4;
+  padding: 16px;
+}
+.doc-placeholder {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #666;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+}
+
+.fields-pane {
+  padding: 20px;
+  overflow-y: auto;
+}
+.fields-pane h3 {
+  margin-top: 0;
+}
+
+.field {
+  margin-bottom: 16px;
+}
+.field label {
+  display: block;
+  font-size: 12px;
+  text-transform: capitalize;
+  color: #555;
+  margin-bottom: 4px;
+}
+.field input {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+}
+.field.flagged input {
+  border-color: #f59e0b;
+  background: #fffbeb;
+}
+
+.flag {
+  font-size: 12px;
+  margin: 4px 0 0;
+}
+.flag.error {
+  color: #dc2626;
+}
+.flag.warning {
+  color: #b45309;
+}
+
+.submit {
+  margin-top: 20px;
+  padding: 10px 16px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.submit:disabled {
+  opacity: 0.5;
+}
