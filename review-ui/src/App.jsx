@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import PdfViewer from "./PdfViewer";
 
 const API = "http://localhost:3000";
 
@@ -124,18 +125,20 @@ export default function App() {
         {selected && (
           <div className="grid grid-cols-2 h-full">
             {/* Document pane — PDF render lands here Day 10 */}
-            <div className="border-r border-slate-200 bg-slate-100 p-6 flex items-center justify-center">
-              <div className="flex flex-col items-center gap-3 text-slate-500 border-2 border-dashed border-slate-300 rounded-xl w-full h-full justify-center">
-                <span className="text-sm">PDF viewer coming in Day 10</span>
-                <a
-                  href={`${API}/jobs/${selected.id}/document`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-sm font-medium text-blue-600 hover:text-blue-700 underline underline-offset-2"
-                >
-                  Open document ↗
-                </a>
-              </div>
+            <div className="border-r border-slate-200 bg-slate-100 p-4">
+              <PdfViewer
+                documentUrl={`${API}/jobs/${selected.id}/document`}
+                highlights={(selected.validation?.flags || [])
+                  .map((f) => {
+                    const node = f.field
+                      .split(".")
+                      .reduce((a, k) => a?.[k], selected.extractedData);
+                    return node?.source?.text
+                      ? { text: node.source.text, severity: f.severity }
+                      : null;
+                  })
+                  .filter(Boolean)}
+              />
             </div>
 
             {/* Fields pane */}
