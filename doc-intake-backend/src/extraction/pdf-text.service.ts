@@ -61,7 +61,8 @@ export class PdfTextService {
   }
 
   private async extractWithPdfjs(buffer: Buffer): Promise<PdfText> {
-    const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+    const importDynamic = new Function("m", "return import(m)");
+    const pdfjs = await importDynamic("pdfjs-dist/legacy/build/pdf.mjs");
     const data = new Uint8Array(buffer);
     const doc = await pdfjs.getDocument({ data, useSystemFonts: true }).promise;
 
